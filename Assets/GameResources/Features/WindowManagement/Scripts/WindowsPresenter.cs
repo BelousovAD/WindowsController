@@ -67,6 +67,7 @@ namespace WindowsController.Feature.WindowManagement
                 if (windowInfo != null)
                 {
                     GameObject nextWindowInstance = Instantiate(windowInfo.GetWindowPrefab(), _parent);
+                    nextWindowInstance.GetComponent<ButtonOpenWindow>().Initialize(this);
                     NextWindow = nextWindowInstance.GetComponent<Window>();
                 }
                 else
