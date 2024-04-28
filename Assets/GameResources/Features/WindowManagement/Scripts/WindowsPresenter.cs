@@ -7,12 +7,14 @@ namespace WindowsController.Feature.WindowManagement
     /// <summary>
     /// Контроллер окон.
     /// </summary>
-    public class WindowsPresenter : MonoBehaviour
+    public sealed class WindowsPresenter : MonoBehaviour
     {
         [SerializeField]
         private Transform _parent = null;
         [SerializeField]
         private List<WindowInfo> _windowInfos = new List<WindowInfo>();
+        [SerializeField]
+        private string _firstWindow = string.Empty;
 
         private Window _currentWindow = null;
 
@@ -87,19 +89,21 @@ namespace WindowsController.Feature.WindowManagement
         /// </summary>
         public void CloseWindow()
         {
-            Destroy(_currentWindow.gameObject);
-
-            if (_parent.childCount > 0)
+            int childCount = _parent.childCount;
+            if (childCount > 1)
             {
-                NextWindow = _parent.GetChild(0).GetComponent<Window>();
+                NextWindow = _parent.GetChild(childCount - 2).GetComponent<Window>();
             }
             else
             {
                 NextWindow = null;
             }
 
+            Destroy(_currentWindow.gameObject);
             SetCurrentWindow(NextWindow);
         }
+
+        private void Start() => OpenWindow(_firstWindow);
 
         private WindowInfo FindWindowInfo(string windowId)
         {
