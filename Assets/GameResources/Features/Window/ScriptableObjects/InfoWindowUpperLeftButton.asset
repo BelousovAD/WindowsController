@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4eaf0dc5597d2e347baf6f73fcc48a6e, type: 3}
   m_Name: InfoWindowUpperLeftButton
   m_EditorClassIdentifier: 
-  _id: 
-  _windowPrefab: {fileID: 0}
+  _id: WindowULB
+  _windowPrefab: {fileID: 8055431776907663466, guid: de5330196c0d4114a8bd72bfe716d76d, type: 3}
