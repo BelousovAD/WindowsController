@@ -1,6 +1,7 @@
 namespace WindowsController.Feature.WindowManagement
 {
     using UnityEngine;
+    using global::WindowsController.Feature.CommandHistory;
 
     /// <summary>
     /// Компонент вызова команд перехода между окнами.
@@ -11,7 +12,7 @@ namespace WindowsController.Feature.WindowManagement
         private string _nextWindowId = string.Empty;
 
         private OpenWindowCommand _command = null;
-        private WindowsController _windowsController = null;
+        private CommandHistory<OpenWindowCommand> _commandHistory = null;
 
         /// <summary>
         /// Устанавливает получателя команд.
@@ -19,18 +20,13 @@ namespace WindowsController.Feature.WindowManagement
         /// <param name="windowsController">Контроллер окон.</param>
         public void Initialize(WindowsController windowsController)
         {
-            _windowsController = windowsController;
-            _command = new OpenWindowCommand(_windowsController, _nextWindowId);
+            _command = new OpenWindowCommand(windowsController, _nextWindowId);
+            _commandHistory = windowsController.GetCommandHistory();
         }
 
         /// <summary>
-        /// Вызывает команду открытия следующего окна.
+        /// Добавляет в историю команду открытия следующего окна.
         /// </summary>
-        public void OpenNextWindow() => _command.Execute();
-
-        /// <summary>
-        /// Вызывает команду закрытия текущего окна.
-        /// </summary>
-        public void CloseCurrentWindow() => _command.Undo();
+        public void OpenNextWindow() => _commandHistory.PushCommand(_command);
     }
 }

@@ -28,6 +28,14 @@ namespace WindowsController.Feature.WindowManagement
         [SerializeField]
         private string _firstWindow = string.Empty;
 
+        private CommandHistory<OpenWindowCommand> _commandHistory = new CommandHistory<OpenWindowCommand>();
+
+        /// <summary>
+        /// Возвращает историю команд.
+        /// </summary>
+        /// <returns>История команд.</returns>
+        public CommandHistory<OpenWindowCommand> GetCommandHistory() => _commandHistory;
+
         private Window _currentWindow = null;
 
         private void SetCurrentWindow(Window value)
