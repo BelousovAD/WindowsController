@@ -1,14 +1,26 @@
 namespace WindowsController.Feature.WindowManagement
 {
+    using System;
     using System.Collections.Generic;
     using UnityEngine;
-    using WindowsController.Feature.Window;
+    using global::WindowsController.Feature.Window;
+    using global::WindowsController.Feature.CommandHistory;
 
     /// <summary>
     /// Контроллер окон.
     /// </summary>
-    public sealed class WindowsPresenter : MonoBehaviour
+    public sealed class WindowsController : MonoBehaviour
     {
+        /// <summary>
+        /// Открылось окно.
+        /// </summary>
+        public event Action<Window> onWindowOpened = delegate { };
+
+        /// <summary>
+        /// Закрылось окно.
+        /// </summary>
+        public event Action<Window> onWindowClosed = delegate { };
+
         [SerializeField]
         private Transform _parent = null;
         [SerializeField]

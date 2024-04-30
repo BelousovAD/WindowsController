@@ -5,17 +5,17 @@ namespace WindowsController.Feature.WindowManagement
     /// </summary>
     public class OpenWindowCommand : ICommand
     {
-        private WindowsPresenter _windowsPresenter = null;
+        private WindowsController _windowsPresenter = null;
         private string _windowId = string.Empty;
 
         /// <summary>
         /// Создаёт экземпляр команды.
         /// </summary>
-        /// <param name="windowsPresenter">Контроллер окон.</param>
+        /// <param name="windowsController">Контроллер окон.</param>
         /// <param name="windowId">Идентификатор следующего окна.</param>
-        public OpenWindowCommand(WindowsPresenter windowsPresenter, string windowId)
+        public OpenWindowCommand(WindowsController windowsController, string windowId)
         {
-            _windowsPresenter = windowsPresenter;
+            _windowsPresenter = windowsController;
             _windowId = windowId;
         }
 

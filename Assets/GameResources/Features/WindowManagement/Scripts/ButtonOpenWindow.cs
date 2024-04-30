@@ -11,16 +11,16 @@ namespace WindowsController.Feature.WindowManagement
         private string _nextWindowId = string.Empty;
 
         private OpenWindowCommand _command = null;
-        private WindowsPresenter _windowsPresenter = null;
+        private WindowsController _windowsController = null;
 
         /// <summary>
         /// Устанавливает получателя команд.
         /// </summary>
-        /// <param name="windowsPresenter">Контроллер окон.</param>
-        public void Initialize(WindowsPresenter windowsPresenter)
+        /// <param name="windowsController">Контроллер окон.</param>
+        public void Initialize(WindowsController windowsController)
         {
-            _windowsPresenter = windowsPresenter;
-            _command = new OpenWindowCommand(_windowsPresenter, _nextWindowId);
+            _windowsController = windowsController;
+            _command = new OpenWindowCommand(_windowsController, _nextWindowId);
         }
 
         /// <summary>
