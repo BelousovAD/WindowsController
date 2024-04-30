@@ -9,10 +9,5 @@ namespace WindowsController.Feature.WindowManagement
         /// Выполняет команду.
         /// </summary>
         public void Execute();
-
-        /// <summary>
-        /// Отменяет команду.
-        /// </summary>
-        public void Undo();
     }
 }

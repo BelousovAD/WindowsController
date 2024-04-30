@@ -1,21 +1,21 @@
 namespace WindowsController.Feature.WindowManagement
 {
     /// <summary>
-    /// Команда открытия следующего окна.
+    /// Команда закрытия окна.
     /// </summary>
-    public class OpenWindowCommand : BaseWindowCommand
+    public class CloseWindowCommand : BaseWindowCommand
     {
         /// <summary>
         /// Создаёт экземпляр команды.
         /// </summary>
         /// <param name="windowsController">Контроллер окон.</param>
         /// <param name="windowId">Идентификатор следующего окна.</param>
-        public OpenWindowCommand(WindowsController windowsController, string windowId)
+        public CloseWindowCommand(WindowsController windowsController, string windowId)
             : base(windowsController, windowId) { }
 
         /// <summary>
-        /// Открывает окно.
+        /// Закрывает окно.
         /// </summary>
-        public override void Execute() => _windowsController.OpenWindow(_windowId);
+        public override void Execute() => _windowsController.CloseWindow(_windowId);
     }
 }

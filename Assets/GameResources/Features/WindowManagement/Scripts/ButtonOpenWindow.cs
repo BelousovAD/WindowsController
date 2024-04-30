@@ -4,15 +4,15 @@ namespace WindowsController.Feature.WindowManagement
     using global::WindowsController.Feature.CommandHistory;
 
     /// <summary>
-    /// Компонент вызова команд перехода между окнами.
+    /// Компонент вызова команд открытия окон.
     /// </summary>
     public class ButtonOpenWindow : MonoBehaviour
     {
         [SerializeField]
         private string _nextWindowId = string.Empty;
 
-        private OpenWindowCommand _command = null;
-        private CommandHistory<OpenWindowCommand> _commandHistory = null;
+        private BaseWindowCommand _command = null;
+        private CommandHistory<BaseWindowCommand> _commandHistory = null;
 
         /// <summary>
         /// Устанавливает получателя команд.
@@ -20,13 +20,13 @@ namespace WindowsController.Feature.WindowManagement
         /// <param name="windowsController">Контроллер окон.</param>
         public void Initialize(WindowsController windowsController)
         {
-            _command = new OpenWindowCommand(windowsController, _nextWindowId);
+            _command = new BaseWindowCommand(windowsController, _nextWindowId);
             _commandHistory = windowsController.GetCommandHistory();
         }
 
         /// <summary>
         /// Добавляет в историю команду открытия следующего окна.
         /// </summary>
-        public void OpenNextWindow() => _commandHistory.PushCommand(_command);
+        public void OpenNextWindow() => _commandHistory.AddToExecutionQueue(_command);
     }
 }

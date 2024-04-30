@@ -26,15 +26,15 @@ namespace WindowsController.Feature.WindowManagement
         [SerializeField]
         private List<WindowInfo> _windowInfos = new List<WindowInfo>();
         [SerializeField]
-        private string _firstWindow = string.Empty;
+        private WindowInfo _firstWindow = null;
 
-        private CommandHistory<OpenWindowCommand> _commandHistory = new CommandHistory<OpenWindowCommand>();
+        private CommandHistory<BaseWindowCommand> _commandHistory = new CommandHistory<BaseWindowCommand>();
 
         /// <summary>
         /// Возвращает историю команд.
         /// </summary>
         /// <returns>История команд.</returns>
-        public CommandHistory<OpenWindowCommand> GetCommandHistory() => _commandHistory;
+        public CommandHistory<BaseWindowCommand> GetCommandHistory() => _commandHistory;
 
         private Window _currentWindow = null;
 
@@ -75,30 +75,20 @@ namespace WindowsController.Feature.WindowManagement
         /// <param name="windowId">Идентификатор окна.</param>
         public void OpenWindow(string windowId)
         {
-            Transform nextWindowTransform = _parent.Find(windowId);
+            WindowInfo windowInfo = FindWindowInfo(windowId);
 
-            if (nextWindowTransform != null)
+            if (windowInfo != null)
             {
-                nextWindowTransform.SetAsFirstSibling();
-                NextWindow = nextWindowTransform.GetComponent<Window>();
+                GameObject nextWindowInstance = Instantiate(windowInfo.GetWindowPrefab(), _parent);
+                nextWindowInstance.GetComponent<ButtonOpenWindow>().Initialize(this);
+                NextWindow = nextWindowInstance.GetComponent<Window>();
             }
             else
             {
-                WindowInfo windowInfo = FindWindowInfo(windowId);
+                Debug.LogError($"Cannot open window: " +
+                    $"WindowInfo with ID \"{windowId}\" does not exist.");
 
-                if (windowInfo != null)
-                {
-                    GameObject nextWindowInstance = Instantiate(windowInfo.GetWindowPrefab(), _parent);
-                    nextWindowInstance.GetComponent<ButtonOpenWindow>().Initialize(this);
-                    NextWindow = nextWindowInstance.GetComponent<Window>();
-                }
-                else
-                {
-                    Debug.LogError($"Cannot open window: " +
-                        $"WindowInfo with ID \"{windowId}\" does not exist.");
-
-                    return;
-                }
+                return;
             }
 
             SetCurrentWindow(NextWindow);
@@ -107,23 +97,74 @@ namespace WindowsController.Feature.WindowManagement
         /// <summary>
         /// Закрывает окно, которое находится в фокусе.
         /// </summary>
-        public void CloseWindow()
+        public void CloseWindow(string windowId)
         {
-            int childCount = _parent.childCount;
-            if (childCount > 1)
+            Transform window = _parent.Find(windowId);
+
+            if (window != null)
             {
-                NextWindow = _parent.GetChild(childCount - 2).GetComponent<Window>();
+                window.gameObject.SetActive(false);
+
+                if (!_commandHistory.IsHistoryEmpty())
+                {
+                    BaseWindowCommand lastExecutedCommand = _commandHistory.GetLastExecutedCommand();
+                    Transform nextWindowTransform = _parent.Find(lastExecutedCommand.GetWindowId());
+
+                    if (nextWindowTransform != null)
+                    {
+                        NextWindow = nextWindowTransform.GetComponent<Window>();
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"Cannot close window: " +
+                        $"There are no open windows");
+
+                    return;
+                }
             }
             else
             {
-                NextWindow = null;
+                Debug.LogError($"Cannot close window: " +
+                    $"WindowInfo with ID \"{windowId}\" does not opened.");
+
+                return;
             }
 
-            Destroy(_currentWindow.gameObject);
             SetCurrentWindow(NextWindow);
         }
 
-        private void Start() => OpenWindow(_firstWindow);
+        private void Start() => OpenWindow(_firstWindow.GetId());
+
+        private void OnEnable()
+        {
+            _commandHistory.onExecuteCommand += HandleCommand;
+            _commandHistory.onCancelCommand += HandleCommand;
+        }
+        
+        private void OnDisable()
+        {
+            _commandHistory.onExecuteCommand -= HandleCommand;
+            _commandHistory.onCancelCommand -= HandleCommand;
+        }
+
+        private void HandleCommand()
+        {
+            while (!_commandHistory.IsExecutionQueueEmpty())
+            {
+                BaseWindowCommand tempBaseCommand = _commandHistory.GetCommandToExecute();
+                OpenWindowCommand tempCommand = new (tempBaseCommand.GetWindowsController(), tempBaseCommand.GetWindowId());
+                tempCommand.Execute();
+                _commandHistory.MoveCommandToHistory();
+            }
+
+            while (!_commandHistory.IsCancellationQueueEmpty())
+            {
+                BaseWindowCommand tempBaseCommand = _commandHistory.GetCommandToExecute();
+                CloseWindowCommand tempCommand = new(tempBaseCommand.GetWindowsController(), tempBaseCommand.GetWindowId());
+                tempCommand.Execute();
+            }
+        }
 
         private WindowInfo FindWindowInfo(string windowId)
         {
